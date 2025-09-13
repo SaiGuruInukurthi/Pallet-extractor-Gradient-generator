@@ -119,8 +119,15 @@
   * {
     @apply border-border outline-ring/50;
   }
+  /* Override body background to use dark GitHub theme instead of light background */
   body {
-    @apply bg-background text-foreground;
+    background: linear-gradient(135deg, #0d1117 0%, #161b22 50%, #21262d 100%) !important;
+    color: white;
+    min-height: 100vh;
+  }
+
+  html {
+    background: #0d1117;
   }
 }
 
