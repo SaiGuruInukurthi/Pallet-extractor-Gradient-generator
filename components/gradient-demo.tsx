@@ -441,46 +441,67 @@ export function GradientDemo() {
 
   return (
     <div className="container mx-auto p-6 space-y-8">
-      {/* Header Section */}
-      <div className="flex flex-col lg:flex-row gap-6">
-        {/* Controls */}
-        <div className="flex flex-col gap-4 lg:w-1/3">
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            onChange={handleImageUpload}
-            className="hidden"
-          />
+      {/* Animated Button Controls - Above Preview */}
+      <div className="flex flex-col items-center gap-4">
+        {/* Hidden file input */}
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          onChange={handleImageUpload}
+          className="hidden"
+        />
+        
+        {/* Animated Button Container */}
+        <div className={`flex gap-3 transition-all duration-500 ease-in-out ${
+          uploadedImage 
+            ? 'justify-center w-full max-w-md' 
+            : 'justify-center'
+        }`}>
           <Button 
             variant="outline" 
-            className="justify-start gap-2 bg-transparent"
+            className={`gap-2 bg-transparent transition-all duration-500 ease-in-out ${
+              uploadedImage 
+                ? 'justify-center flex-1' 
+                : 'justify-center px-8'
+            }`}
             onClick={handleImportClick}
           >
             <Upload className="h-4 w-4" />
             Import Image
           </Button>
-          {uploadedImage && (
+          
+          {/* Remove Button with Slide Animation */}
+          <div className={`overflow-hidden transition-all duration-500 ease-in-out ${
+            uploadedImage 
+              ? 'max-w-[200px] opacity-100' 
+              : 'max-w-0 opacity-0'
+          }`}>
             <Button 
               variant="outline" 
-              className="justify-start gap-2 bg-transparent text-destructive hover:bg-destructive/10"
+              className="justify-center gap-2 bg-transparent text-destructive hover:bg-destructive/10 whitespace-nowrap"
               onClick={handleRemoveImage}
             >
               <X className="h-4 w-4" />
               Remove Image
             </Button>
-          )}
-          {isExtracting && (
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <div className="w-4 h-4 border-2 border-accent border-t-transparent rounded-full animate-spin"></div>
-              Extracting colors...
-            </div>
-          )}
+          </div>
         </div>
+        
+        {/* Extraction Status */}
+        {isExtracting && (
+          <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground animate-fade-in">
+            <div className="w-4 h-4 border-2 border-accent border-t-transparent rounded-full animate-spin"></div>
+            Extracting colors...
+          </div>
+        )}
+      </div>
 
-        {/* Preview Area */}
+      {/* Preview Section */}
+      <div className="flex justify-center">
+        {/* Centered Preview Area */}
         <Card 
-          className={`flex-1 relative overflow-hidden min-h-[300px] transition-all duration-200 ${
+          className={`w-full max-w-2xl relative overflow-hidden min-h-[300px] transition-all duration-200 ${
             isDragOver 
               ? 'border-2 border-dashed border-accent bg-accent/5' 
               : 'border border-border'
