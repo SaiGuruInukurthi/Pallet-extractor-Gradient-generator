@@ -16,12 +16,15 @@ export interface ColorResult {
 }
 
 export class ColorExtractor {
-  private canvas: HTMLCanvasElement;
-  private ctx: CanvasRenderingContext2D;
+  private canvas: HTMLCanvasElement | null = null;
+  private ctx: CanvasRenderingContext2D | null = null;
 
   constructor() {
-    this.canvas = document.createElement('canvas');
-    this.ctx = this.canvas.getContext('2d')!;
+    // Only create canvas in browser environment
+    if (typeof window !== 'undefined' && typeof document !== 'undefined') {
+      this.canvas = document.createElement('canvas');
+      this.ctx = this.canvas.getContext('2d');
+    }
   }
 
   /**
@@ -33,6 +36,11 @@ export class ColorExtractor {
     maxDimension: number = 300
   ): Promise<ColorResult[]> {
     try {
+      // Check if canvas is available (browser environment)
+      if (!this.canvas || !this.ctx) {
+        throw new Error('Canvas not available - this method can only be used in browser environment');
+      }
+
       // Load image
       const img = await this.loadImage(imageSource);
       

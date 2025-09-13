@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Copy, Download, Upload, Palette, X } from "lucide-react"
 import { ColorExtractor, type ColorResult } from "@/lib/color-extractor"
+import { AnimatedBackground } from "@/components/animated-background"
 
 export function GradientDemo() {
   const [selectedPalette, setSelectedPalette] = useState(0)
@@ -28,7 +29,7 @@ export function GradientDemo() {
     text: "",
   })
   const fileInputRef = useRef<HTMLInputElement>(null)
-  const colorExtractor = useRef(new ColorExtractor())
+  const colorExtractor = useRef<ColorExtractor | null>(null)
 
   // Helper function to determine contrasting text color
   const getContrastColor = (hexColor: string): string => {
@@ -317,6 +318,8 @@ export function GradientDemo() {
       const imageData = e.target?.result as string
       setUploadedImage(imageData)
       setImageLoading(false)
+      
+      // Beautiful reveal animation after image loads
       setTimeout(() => setIsExpanded(true), 300)
 
       // Automatically extract palette using the fresh image data
@@ -355,6 +358,11 @@ export function GradientDemo() {
 
     setIsExtracting(true)
     try {
+      // Initialize ColorExtractor lazily (only in browser)
+      if (!colorExtractor.current) {
+        colorExtractor.current = new ColorExtractor()
+      }
+      
       const results = await colorExtractor.current.extractColors(imageToProcess, 5)
       setExtractedColors(results)
 
@@ -483,85 +491,118 @@ export function GradientDemo() {
 
   if (!isExpanded && !uploadedImage) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-6">
-        {/* Hidden file input */}
-        <input ref={fileInputRef} type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
+      <>
+        {/* Animated Background with Floating Particles */}
+        <AnimatedBackground />
+        
+        <div className="min-h-screen flex flex-col items-center justify-center p-6 text-center relative">
+          {/* Hidden file input */}
+          <input ref={fileInputRef} type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
 
-        {/* Minimal Upload Interface */}
-        <div className="w-full max-w-2xl">
-          {/* Import Button - Centered */}
-          <div className="flex justify-center mb-8">
-            <Button
-              variant="outline-glow"
-              className="gap-2 bg-transparent px-8 py-3 text-lg"
-              onClick={handleImportClick}
-            >
-              <Upload className="h-5 w-5" />
-              Import Image
-            </Button>
-          </div>
-
-          {/* Upload Area */}
-          <Card
-            className={`relative overflow-hidden min-h-[400px] transition-all duration-300 cursor-pointer ${
-              isDragOver
-                ? "border-2 border-dashed border-accent bg-accent/5 scale-[1.02]"
-                : "border border-border hover:border-accent/50"
-            }`}
-            onDragOver={handleDragOver}
-            onDragLeave={handleDragLeave}
-            onDrop={handleDrop}
-            onClick={handleImportClick}
-          >
-            {imageLoading ? (
-              /* Loading state */
-              <div className="absolute inset-0 flex items-center justify-center bg-muted/50">
-                <div className="flex flex-col items-center gap-4">
-                  <div className="w-12 h-12 border-2 border-accent border-t-transparent rounded-full animate-spin"></div>
-                  <p className="text-lg text-muted-foreground">Loading image...</p>
-                </div>
+          {/* Main Content */}
+          <div className="max-w-4xl mx-auto space-y-8">
+            {/* Project Icon */}
+            <div className="flex justify-center mb-6">
+              <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-2xl">
+                <Palette className="h-10 w-10 text-white" />
               </div>
-            ) : (
-              /* Clean, minimal placeholder */
-              <div className="h-full flex items-center justify-center">
+            </div>
+
+            {/* Title */}
+            <h1 className="text-6xl font-bold text-white mb-6 tracking-tight">
+              Color Palette Extractor
+            </h1>
+
+            {/* Subtitle */}
+            <p className="text-xl text-gray-400 mb-8 max-w-2xl mx-auto leading-relaxed">
+              Extract Color Palette from Any Image
+            </p>
+
+            {/* Feature Cards */}
+            <div className="grid md:grid-cols-3 gap-6 mb-12 text-left">
+              <div className="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-xl p-6 hover:bg-gray-800/70 transition-all duration-300 hover:border-blue-400 hover:shadow-[0_0_20px_rgba(59,130,246,0.5)]">
+                <div className="text-blue-400 mb-3">
+                  <Upload className="h-6 w-6" />
+                </div>
+                <h3 className="text-white font-semibold mb-2">Upload & Extract</h3>
+                <p className="text-gray-400 text-sm">Drag and drop any image to extract the 5 most dominant colors using K-means clustering</p>
+              </div>
+              
+              <div className="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-xl p-6 hover:bg-gray-800/70 transition-all duration-300 hover:border-purple-400 hover:shadow-[0_0_20px_rgba(139,92,246,0.5)]">
+                <div className="text-purple-400 mb-3">
+                  <Palette className="h-6 w-6" />
+                </div>
+                <h3 className="text-white font-semibold mb-2">Copy Colors</h3>
+                <p className="text-gray-400 text-sm">Click any color to copy its hex code directly to your clipboard</p>
+              </div>
+              
+              <div className="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-xl p-6 hover:bg-gray-800/70 transition-all duration-300 hover:border-green-400 hover:shadow-[0_0_20px_rgba(34,197,94,0.5)]">
+                <div className="text-green-400 mb-3">
+                  <Download className="h-6 w-6" />
+                </div>
+                <h3 className="text-white font-semibold mb-2">Generate Wallpapers</h3>
+                <p className="text-gray-400 text-sm">Create gradient wallpapers from images in multiple formats</p>
+              </div>
+            </div>
+
+            {/* CTA Drop Zone */}
+            <div className="flex justify-center">
+              <div
+                className={`w-full max-w-4xl h-32 border-2 border-dashed border-gray-500 bg-transparent rounded-xl cursor-pointer transition-all duration-300 flex items-center justify-center group ${
+                  isDragOver
+                    ? "border-blue-400 bg-blue-500/10 scale-[1.02] shadow-[0_0_30px_rgba(59,130,246,0.8)]"
+                    : "hover:border-gray-400 hover:bg-gray-800/20 hover:shadow-[0_0_25px_rgba(156,163,175,0.6)] hover:scale-[1.01]"
+                }`}
+                onClick={handleImportClick}
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
+                onDrop={handleDrop}
+              >
                 <div className="text-center">
-                  <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-muted flex items-center justify-center">
-                    <Palette className="h-12 w-12 text-muted-foreground" />
+                  <div className="flex items-center justify-center gap-3 mb-2">
+                    <Upload className={`h-6 w-6 transition-colors duration-300 ${
+                      isDragOver ? "text-blue-400" : "text-gray-400 group-hover:text-gray-300"
+                    }`} />
+                    <span className={`text-lg font-semibold transition-colors duration-300 ${
+                      isDragOver ? "text-blue-400" : "text-gray-300 group-hover:text-white"
+                    }`}>
+                      {isDragOver ? "Drop image to extract colors" : "Start Extracting Colors"}
+                    </span>
                   </div>
-                  <h2
-                    className={`text-2xl font-semibold mb-3 transition-colors duration-200 ${
-                      isDragOver ? "text-accent" : "text-foreground"
-                    }`}
-                  >
-                    {isDragOver ? "Drop image to extract colors" : "Upload an image"}
-                  </h2>
-                  <p
-                    className={`text-base transition-colors duration-200 ${
-                      isDragOver ? "text-accent/70" : "text-muted-foreground"
-                    }`}
-                  >
-                    {isDragOver ? "Release to upload and generate gradients" : "Drag & drop or click Import"}
+                  <p className={`text-sm transition-colors duration-300 ${
+                    isDragOver ? "text-blue-400/70" : "text-gray-500 group-hover:text-gray-400"
+                  }`}>
+                    {isDragOver ? "Release to upload and analyze" : "Drag & drop an image or click to browse"}
                   </p>
                 </div>
               </div>
-            )}
+            </div>
+          </div>
 
-            {/* Drag overlay for better visual feedback */}
-            {isDragOver && (
-              <div className="absolute inset-0 bg-accent/10 border-2 border-dashed border-accent rounded-lg pointer-events-none" />
-            )}
-          </Card>
+          {/* Footer */}
+          <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2">
+            <p 
+              className="text-gray-500 text-sm cursor-pointer transition-all duration-300 hover:text-gray-300 hover:transform hover:scale-105 hover:-translate-y-1 active:scale-95"
+              onClick={() => window.open('https://github.com/SaiGuruInukurthi/Pallet-extractor-Gradient-generator', '_blank')}
+            >
+              Made by GitHub Community GITAM Hyderabad • Learn by Doing
+            </p>
+          </div>
         </div>
-      </div>
+      </>
     )
   }
 
   return (
-    <div
-      className={`container mx-auto p-6 space-y-8 transition-all duration-700 ease-out ${
-        isExpanded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
-      }`}
-    >
+    <>
+      {/* Animated Background with Floating Particles */}
+      <AnimatedBackground />
+      
+      <div
+        className={`container mx-auto p-6 space-y-8 transition-all duration-700 ease-out ${
+          isExpanded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+        }`}
+      >
       {/* Animated Button Controls - Above Preview */}
       <div className="flex flex-col items-center gap-4">
         {/* Hidden file input */}
@@ -573,17 +614,6 @@ export function GradientDemo() {
             uploadedImage ? "justify-center w-full max-w-md" : "justify-center"
           }`}
         >
-          <Button
-            variant="outline-glow"
-            className={`gap-2 bg-transparent transition-all duration-500 ease-in-out ${
-              uploadedImage ? "justify-center flex-1" : "justify-center px-8"
-            }`}
-            onClick={handleImportClick}
-          >
-            <Upload className="h-4 w-4" />
-            Import Image
-          </Button>
-
           {/* Remove Button with Slide Animation */}
           <div
             className={`overflow-hidden transition-all duration-500 ease-in-out ${
@@ -592,7 +622,7 @@ export function GradientDemo() {
           >
             <Button
               variant="outline-glow"
-              className="justify-center gap-2 text-red-400 hover:text-red-300 whitespace-nowrap hover:bg-red-500/10 shadow-[0_0_10px_rgba(239,68,68,0.3)] hover:shadow-[0_0_15px_rgba(239,68,68,0.5)]"
+              className="justify-center gap-2 text-red-400 hover:text-red-300 whitespace-nowrap hover:bg-red-500/10 border-red-500/50 hover:border-red-400 shadow-[0_0_10px_rgba(239,68,68,0.4)] hover:shadow-[0_0_20px_rgba(239,68,68,0.6)]"
               onClick={handleRemoveImage}
             >
               <X className="h-4 w-4" />
@@ -682,7 +712,7 @@ export function GradientDemo() {
         }`}
       >
         {/* Palette Display */}
-        <Card className="p-6 bg-white/10 backdrop-blur-md border-white/20">
+        <Card className="p-6 bg-white/10 backdrop-blur-md border-white/20 max-w-4xl mx-auto">
           <h3 className="text-lg font-semibold mb-4 text-white">
             {extractedColors.length > 0 ? "Extracted Color Palette" : "Color Palette"}
           </h3>
@@ -936,5 +966,6 @@ export function GradientDemo() {
         </div>
       )}
     </div>
+    </>
   )
 }
