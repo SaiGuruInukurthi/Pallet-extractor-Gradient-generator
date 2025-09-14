@@ -640,6 +640,18 @@ export function GradientDemo() {
         )}
       </div>
 
+      {/* Title above preview area when image is uploaded */}
+      {uploadedImage && (
+        <div className="text-center mb-6">
+          <h1 className="text-4xl font-bold text-white mb-2 tracking-tight">
+            Color Palette Extractor
+          </h1>
+          <p className="text-lg text-gray-400">
+            Extract Color Palette from Any Image
+          </p>
+        </div>
+      )}
+
       {/* Preview Section */}
       <div className="flex justify-center">
         {/* Centered Preview Area with Acrylic Glass Design */}
@@ -790,7 +802,7 @@ export function GradientDemo() {
                 {palettes[selectedPalette].map((color, index) => (
                   <div key={index} className="group cursor-pointer" onClick={(e) => copyToClipboard(color, e)}>
                     <div
-                      className={`w-full aspect-square rounded-lg shadow-sm border transition-all duration-200 hover:shadow-md relative flex items-center justify-center min-h-[120px] ${
+                      className={`w-full aspect-square rounded-lg shadow-sm border transition-all duration-200 hover:shadow-md relative flex flex-col items-center justify-center min-h-[120px] ${
                         copiedColor === color ? "border-green-500 border-2 scale-105" : "border-border hover:scale-105"
                       }`}
                       style={{ backgroundColor: color }}
@@ -967,6 +979,16 @@ export function GradientDemo() {
           {cursorTooltip.text}
         </div>
       )}
+
+      {/* Footer for main app */}
+      <div className="mt-12 mb-6 text-center">
+        <p 
+          className="text-gray-500 text-sm cursor-pointer transition-all duration-300 hover:text-gray-300 hover:transform hover:scale-105 hover:-translate-y-1 active:scale-95"
+          onClick={() => window.open('https://github.com/SaiGuruInukurthi/Pallet-extractor-Gradient-generator', '_blank')}
+        >
+          Made by GitHub Community GITAM Hyderabad • Learn by Doing
+        </p>
+      </div>
     </div>
     </>
   )
