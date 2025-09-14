@@ -642,10 +642,12 @@ export function GradientDemo() {
 
       {/* Preview Section */}
       <div className="flex justify-center">
-        {/* Centered Preview Area */}
+        {/* Centered Preview Area with Acrylic Glass Design */}
         <Card
-          className={`w-full max-w-2xl relative overflow-hidden min-h-[300px] transition-all duration-200 ${
-            isDragOver ? "border-2 border-dashed border-accent bg-accent/5" : "border border-border"
+          className={`w-full max-w-2xl relative overflow-hidden min-h-[300px] transition-all duration-300 bg-white/10 backdrop-blur-md border-white/20 ${
+            isDragOver 
+              ? "border-2 border-dashed border-blue-400 bg-blue-500/10 shadow-[0_0_30px_rgba(59,130,246,0.4)]" 
+              : "hover:border-white/30"
           }`}
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
@@ -660,13 +662,13 @@ export function GradientDemo() {
               </div>
             </div>
           ) : uploadedImage ? (
-            /* Display uploaded image with dynamic sizing */
-            <div className="p-4 h-full flex items-center justify-center">
+            /* Display uploaded image with acrylic design matching palette */
+            <div className="p-6 h-full flex items-center justify-center">
               <div className="relative max-w-full max-h-full">
                 <img
                   src={uploadedImage || "/placeholder.svg"}
                   alt="Uploaded image for color extraction"
-                  className="max-w-full max-h-[400px] w-auto h-auto object-contain rounded-lg shadow-lg border border-border"
+                  className="max-w-full max-h-[400px] w-auto h-auto object-contain rounded-lg shadow-lg"
                   style={{
                     minHeight: "200px",
                     maxWidth: "100%",
@@ -822,17 +824,17 @@ export function GradientDemo() {
           isExpanded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
         }`}
       >
-        <h3 className="text-lg font-semibold text-white">Gradient Wallpapers</h3>
+        <h3 className="text-2xl font-bold text-white text-center">Gradient Wallpapers</h3>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 place-items-center">
           {gradientPreviews.map((preview, index) => (
             <div key={index} className="space-y-4 w-full max-w-sm flex flex-col items-center">
               {/* Custom Gradient Type Selector */}
               <div className="w-full relative">
-                <label className="text-sm font-medium text-black mb-2 block">{preview.name} Gradient Type</label>
+                <label className="text-sm font-medium text-white mb-2 block">{preview.name} Gradient Type</label>
                 <button
                   onClick={() => setShowGradientSelector(showGradientSelector === index ? null : index)}
-                  className="w-full px-3 py-2 text-sm border border-border rounded-md bg-background hover:bg-muted/50 focus:outline-none focus:ring-2 focus:ring-accent flex items-center justify-between"
+                  className="w-full px-3 py-2 text-sm border border-gray-600 rounded-md bg-gray-800/50 hover:bg-gray-700/50 focus:outline-none focus:ring-2 focus:ring-blue-500 flex items-center justify-between text-white"
                 >
                   <span>{getGradientLabel(selectedGradientTypes[index] || "linear-135")}</span>
                   <svg
@@ -847,10 +849,10 @@ export function GradientDemo() {
 
                 {/* Custom Dropdown */}
                 {showGradientSelector === index && (
-                  <div className="absolute top-full left-0 right-0 mt-1 bg-card border border-border rounded-lg shadow-lg z-50 p-4">
+                  <div className="absolute top-full left-0 right-0 mt-1 bg-gray-800 border border-gray-600 rounded-lg shadow-lg z-50 p-4">
                     {gradientCategories.map((category) => (
                       <div key={category.label} className="mb-4 last:mb-0">
-                        <h4 className="text-sm font-medium text-foreground mb-2 pb-1 border-b border-border">
+                        <h4 className="text-sm font-medium text-white mb-2 pb-1 border-b border-gray-600">
                           {category.label}
                         </h4>
                         <div className="grid grid-cols-4 gap-2">
@@ -863,8 +865,8 @@ export function GradientDemo() {
                               }}
                               className={`px-2 py-1 text-xs rounded border transition-colors ${
                                 selectedGradientTypes[index] === option.value
-                                  ? "bg-accent text-accent-foreground border-accent"
-                                  : "bg-background hover:bg-muted border-border"
+                                  ? "bg-blue-600 text-white border-blue-500"
+                                  : "bg-gray-100 hover:bg-gray-200 border-gray-300 text-black"
                               }`}
                             >
                               {option.label}
