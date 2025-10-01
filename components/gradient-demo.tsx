@@ -363,7 +363,7 @@ export function GradientDemo() {
         colorExtractor.current = new ColorExtractor()
       }
       
-      const results = await colorExtractor.current.extractColors(imageToProcess, 5)
+      const results = await colorExtractor.current.extractColors(imageToProcess, 5, Infinity) // Use full resolution - no downscaling!
       setExtractedColors(results)
 
       // Auto-generate gradients from extracted colors
@@ -495,7 +495,7 @@ export function GradientDemo() {
         {/* Animated Background with Floating Particles */}
         <AnimatedBackground />
         
-        <div className="min-h-screen flex flex-col items-center justify-center p-6 text-center relative">
+        <div className="min-h-screen flex flex-col items-center justify-center p-4 sm:p-6 text-center relative pb-20">
           {/* Hidden file input */}
           <input ref={fileInputRef} type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
 
@@ -580,7 +580,7 @@ export function GradientDemo() {
           </div>
 
           {/* Footer */}
-          <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2">
+          <div className="mt-12 mb-6 text-center">
             <p 
               className="text-gray-500 text-sm cursor-pointer transition-all duration-300 hover:text-gray-300 hover:transform hover:scale-105 hover:-translate-y-1 active:scale-95"
               onClick={() => window.open('https://github.com/SaiGuruInukurthi/Pallet-extractor-Gradient-generator', '_blank')}
@@ -599,7 +599,7 @@ export function GradientDemo() {
       <AnimatedBackground />
       
       <div
-        className={`container mx-auto p-6 space-y-8 transition-all duration-700 ease-out ${
+        className={`container mx-auto p-4 sm:p-6 pt-8 pb-20 space-y-8 transition-all duration-700 ease-out ${
           isExpanded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
         }`}
       >
@@ -726,7 +726,7 @@ export function GradientDemo() {
         }`}
       >
         {/* Palette Display */}
-        <Card className="p-6 bg-white/10 backdrop-blur-md border-white/20 max-w-4xl mx-auto">
+        <Card className="p-4 sm:p-6 bg-white/10 backdrop-blur-md border-white/20 max-w-4xl mx-auto">
           <h3 className="text-lg font-semibold mb-4 text-white">
             {extractedColors.length > 0 ? "Extracted Color Palette" : "Color Palette"}
           </h3>
@@ -746,7 +746,7 @@ export function GradientDemo() {
                 </Button>
               </div>
 
-              <div className="grid grid-cols-5 gap-4 w-full">
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 sm:gap-4 w-full">
                 {extractedColors.map((colorResult, index) => (
                   <div
                     key={index}
@@ -754,7 +754,7 @@ export function GradientDemo() {
                     onClick={(e) => copyToClipboard(colorResult.color, e)}
                   >
                     <div
-                      className={`w-full aspect-square rounded-lg shadow-sm border transition-all duration-200 hover:shadow-md relative flex flex-col items-center justify-center min-h-[120px] ${
+                      className={`w-full aspect-square rounded-lg shadow-sm border transition-all duration-200 hover:shadow-md relative flex flex-col items-center justify-center min-h-[100px] sm:min-h-[120px] ${
                         copiedColor === colorResult.color
                           ? "border-green-500 border-2 scale-105"
                           : "border-border hover:scale-105"
@@ -763,9 +763,9 @@ export function GradientDemo() {
                       title={`${colorResult.color} - Click to copy`}
                     >
                       {/* Hex code overlay */}
-                      <div className="absolute inset-0 flex flex-col items-center justify-center">
+                      <div className="absolute inset-0 flex flex-col items-center justify-center p-1">
                         <span
-                          className="text-sm font-mono font-bold px-2 py-1 rounded backdrop-blur-sm"
+                          className="text-xs sm:text-sm font-mono font-bold px-1 sm:px-2 py-0.5 sm:py-1 rounded backdrop-blur-sm text-center"
                           style={{
                             color: getContrastColor(colorResult.color),
                             backgroundColor:
@@ -777,7 +777,7 @@ export function GradientDemo() {
                           {colorResult.color.toUpperCase()}
                         </span>
                         <span
-                          className="text-xs mt-2 px-2 py-0.5 rounded backdrop-blur-sm"
+                          className="text-xs mt-1 sm:mt-2 px-1 sm:px-2 py-0.5 rounded backdrop-blur-sm"
                           style={{
                             color: getContrastColor(colorResult.color),
                             backgroundColor:
@@ -786,14 +786,14 @@ export function GradientDemo() {
                                 : "rgba(0,0,0,0.6)",
                           }}
                         >
-                          {Math.round(colorResult.frequency * 100)}%
+                          {Math.round(colorResult.frequency)}%
                         </span>
                       </div>
                     </div>
                   </div>
                 ))}
               </div>
-              <p className="text-xs text-white text-center">Click on any color box to copy its hex code to clipboard</p>
+              <p className="text-xs sm:text-sm text-white text-center mt-4">Click on any color box to copy its hex code to clipboard</p>
             </div>
           ) : (
             /* Display default palette samples */
