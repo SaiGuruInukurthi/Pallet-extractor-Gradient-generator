@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState, useRef } from "react"
+import { useState, useRef, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Copy, Download, Upload, Palette, X } from "lucide-react"
@@ -22,6 +22,7 @@ export function GradientDemo() {
   const [selectedGradientTypes, setSelectedGradientTypes] = useState<string[]>(["linear-135", "linear-180", "radial"])
   const [showGradientSelector, setShowGradientSelector] = useState<number | null>(null)
   const [isExpanded, setIsExpanded] = useState(false)
+  const [showPasteNotification, setShowPasteNotification] = useState(false)
   const [cursorTooltip, setCursorTooltip] = useState<{ show: boolean; x: number; y: number; text: string }>({
     show: false,
     x: 0,
@@ -334,6 +335,43 @@ export function GradientDemo() {
     reader.readAsDataURL(file)
   }
 
+  // Handle paste from clipboard
+  const handlePaste = (event: ClipboardEvent) => {
+    const items = event.clipboardData?.items
+    if (!items) return
+
+    // Find the first image item in clipboard
+    for (let i = 0; i < items.length; i++) {
+      const item = items[i]
+      
+      // Check if the item is an image
+      if (item.type.startsWith('image/')) {
+        event.preventDefault() // Prevent default paste behavior
+        
+        // Show paste notification
+        setShowPasteNotification(true)
+        setTimeout(() => setShowPasteNotification(false), 2000)
+        
+        const file = item.getAsFile()
+        if (file) {
+          processImageFile(file)
+        }
+        break
+      }
+    }
+  }
+
+  // Add paste event listener
+  useEffect(() => {
+    // Add event listener for paste
+    document.addEventListener('paste', handlePaste)
+
+    // Cleanup on component unmount
+    return () => {
+      document.removeEventListener('paste', handlePaste)
+    }
+  }, []) // Empty dependency array means this runs once on mount
+
   const handleImportClick = () => {
     fileInputRef.current?.click()
   }
@@ -364,10 +402,13 @@ export function GradientDemo() {
       }
       
       const results = await colorExtractor.current.extractColors(imageToProcess, 5, Infinity) // Use full resolution - no downscaling!
-      setExtractedColors(results)
+      
+      // Apply largest remainder rounding to ensure percentages add up to exactly 100
+      const roundedResults = roundPercentagesToHundred(results)
+      setExtractedColors(roundedResults)
 
       // Auto-generate gradients from extracted colors
-      const gradients = generateGradients(results)
+      const gradients = generateGradients(roundedResults)
       setGeneratedGradients(gradients)
     } catch (error) {
       console.error("Color extraction failed:", error)
@@ -375,6 +416,34 @@ export function GradientDemo() {
     } finally {
       setIsExtracting(false)
     }
+  }
+
+  // Largest remainder method to ensure rounded percentages add up to 100
+  const roundPercentagesToHundred = (colors: ColorResult[]): ColorResult[] => {
+    // Calculate integer parts and remainders
+    const withRounding = colors.map(color => ({
+      color,
+      floor: Math.floor(color.frequency),
+      remainder: color.frequency - Math.floor(color.frequency)
+    }))
+
+    // Calculate how many need to be rounded up
+    const currentSum = withRounding.reduce((sum, item) => sum + item.floor, 0)
+    const diff = 100 - currentSum
+
+    // Sort by remainder (descending) to determine which ones to round up
+    withRounding.sort((a, b) => b.remainder - a.remainder)
+
+    // Round up the top 'diff' items
+    const rounded = withRounding.map((item, index) => ({
+      ...item.color,
+      frequency: index < diff ? item.floor + 1 : item.floor
+    }))
+
+    // Restore original order (by frequency descending)
+    rounded.sort((a, b) => b.frequency - a.frequency)
+
+    return rounded
   }
 
   const copyToClipboard = async (color: string, event: React.MouseEvent) => {
@@ -525,7 +594,7 @@ export function GradientDemo() {
                   <Upload className="h-6 w-6" />
                 </div>
                 <h3 className="text-white font-semibold mb-2">Upload & Extract</h3>
-                <p className="text-gray-400 text-sm">Drag and drop any image to extract the 5 most dominant colors using K-means clustering</p>
+                <p className="text-gray-400 text-sm">Upload images via drag & drop, paste (Ctrl+V), or click. Advanced LAB color space analysis with CIE94 Delta-E for professional-grade color extraction</p>
               </div>
               
               <div className="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-xl p-6 hover:bg-gray-800/70 transition-all duration-300 hover:border-purple-400 hover:shadow-[0_0_20px_rgba(139,92,246,0.5)]">
@@ -572,7 +641,7 @@ export function GradientDemo() {
                   <p className={`text-sm transition-colors duration-300 ${
                     isDragOver ? "text-blue-400/70" : "text-gray-500 group-hover:text-gray-400"
                   }`}>
-                    {isDragOver ? "Release to upload and analyze" : "Drag & drop an image or click to browse"}
+                    {isDragOver ? "Release to upload and analyze" : "Drag & drop, paste (Ctrl+V), or click to browse"}
                   </p>
                 </div>
               </div>
@@ -786,7 +855,7 @@ export function GradientDemo() {
                                 : "rgba(0,0,0,0.6)",
                           }}
                         >
-                          {Math.round(colorResult.frequency)}%
+                          {colorResult.frequency}%
                         </span>
                       </div>
                     </div>
@@ -989,6 +1058,16 @@ export function GradientDemo() {
           Made by GitHub Community GITAM Hyderabad • Learn by Doing
         </p>
       </div>
+
+      {/* Paste Notification Toast */}
+      {showPasteNotification && (
+        <div className="fixed bottom-8 left-1/2 transform -translate-x-1/2 z-50 animate-fade-in">
+          <div className="bg-blue-500 text-white px-6 py-3 rounded-lg shadow-2xl flex items-center gap-3 border border-blue-400">
+            <Upload className="h-5 w-5" />
+            <span className="font-medium">Image pasted from clipboard!</span>
+          </div>
+        </div>
+      )}
     </div>
     </>
   )
