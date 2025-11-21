@@ -8,6 +8,10 @@
 
 > A professional-grade web application that extracts dominant colors from images using advanced computer vision algorithms. Built with Next.js, TypeScript, and modern web technologies.
 
+## 🚀 Live Demo
+
+**[Try it now →  https://v0-ui-gradient-generator.vercel.app](https://v0-ui-gradient-generator.vercel.app/)**
+
 ## ✨ Features
 
 ### 🎨 **Advanced Color Extraction**
@@ -41,11 +45,7 @@
 - **Desktop Enhanced**: 5-column grid for large screens
 - **Touch-friendly**: Large touch targets for mobile interaction
 
-## 🚀 Live Demo
-
-**[View Live Application](https://vercel.com/srivenkatasaiguru-3331s-projects/v0-ui-gradient-generator)**
-
-## 🛠️ Technology Stack
+## ️ Technology Stack
 
 - **Frontend Framework**: Next.js 14.2.16 (React 18)
 - **Language**: TypeScript 5.0+
