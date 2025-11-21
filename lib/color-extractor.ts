@@ -1,6 +1,19 @@
 /**
  * Advanced LAB+DBSCAN Color Extraction Utility
  * Uses perceptually uniform LAB color space with density-based clustering
+ * 
+ * Key Features:
+ * - Pixel-perfect accuracy: Counts every pixel individually
+ * - LAB color space: Perceptually uniform color representation
+ * - CIE94 Delta-E: Professional color difference calculations
+ * - Minimum frequency threshold (0.5%): Filters noise and anti-aliasing artifacts
+ * - Frequency-based selection: Returns only real colors from the image
+ * - No artificial colors: If image has 3 colors, returns 3 colors (not forced to 5)
+ * - Conservative merging: Preserves distinct colors while removing near-duplicates
+ * 
+ * Version: 2.0.0
+ * Last Updated: November 21, 2025
+ * Fix: Removed forced diversity selection that was creating artificial colors
  */
 
 export interface RGB {
@@ -500,18 +513,30 @@ export class ColorExtractor {
 
   /**
    * Select diverse colors ensuring good representation across color types
+   * Only includes colors above a minimum threshold to avoid "making up" colors
    */
   private selectDiverseColors(colors: ColorResult[], maxColors: number): ColorResult[] {
-    if (colors.length <= maxColors) return colors;
+    // Filter out colors with very low frequency (< 0.5%)
+    // These are usually anti-aliasing artifacts or noise
+    const MIN_FREQUENCY_THRESHOLD = 0.5;
+    const significantColors = colors.filter(c => c.frequency >= MIN_FREQUENCY_THRESHOLD);
     
-    // Categorize colors
+    console.log(`🎨 Filtered colors: ${colors.length} -> ${significantColors.length} (threshold: ${MIN_FREQUENCY_THRESHOLD}%)`);
+    
+    // If we have fewer significant colors than requested, just return what we have
+    if (significantColors.length <= maxColors) {
+      console.log(`✅ Returning ${significantColors.length} significant colors (requested ${maxColors})`);
+      return significantColors;
+    }
+    
+    // Categorize only significant colors
     const colorCategories = {
-      red: colors.filter(c => c.rgb.r > 180 && c.rgb.g < 100 && c.rgb.b < 100),
-      orange: colors.filter(c => c.rgb.r > 200 && c.rgb.g > 100 && c.rgb.g < 150 && c.rgb.b < 100),
-      purple: colors.filter(c => c.rgb.r > 100 && c.rgb.g < 100 && c.rgb.b > 100),
-      blue: colors.filter(c => c.rgb.r < 100 && c.rgb.g < 100 && c.rgb.b > 100),
-      gray: colors.filter(c => Math.abs(c.rgb.r - c.rgb.g) < 30 && Math.abs(c.rgb.g - c.rgb.b) < 30),
-      other: colors.filter(c => 
+      red: significantColors.filter(c => c.rgb.r > 180 && c.rgb.g < 100 && c.rgb.b < 100),
+      orange: significantColors.filter(c => c.rgb.r > 200 && c.rgb.g > 100 && c.rgb.g < 150 && c.rgb.b < 100),
+      purple: significantColors.filter(c => c.rgb.r > 100 && c.rgb.g < 100 && c.rgb.b > 100),
+      blue: significantColors.filter(c => c.rgb.r < 100 && c.rgb.g < 100 && c.rgb.b > 100),
+      gray: significantColors.filter(c => Math.abs(c.rgb.r - c.rgb.g) < 30 && Math.abs(c.rgb.g - c.rgb.b) < 30),
+      other: significantColors.filter(c => 
         !(c.rgb.r > 180 && c.rgb.g < 100 && c.rgb.b < 100) && // not red
         !(c.rgb.r > 200 && c.rgb.g > 100 && c.rgb.g < 150 && c.rgb.b < 100) && // not orange
         !(c.rgb.r > 100 && c.rgb.g < 100 && c.rgb.b > 100) && // not purple
@@ -523,60 +548,19 @@ export class ColorExtractor {
     console.log('🎨 Color category breakdown:');
     console.log(`Red: ${colorCategories.red.length}, Orange: ${colorCategories.orange.length}, Purple: ${colorCategories.purple.length}, Blue: ${colorCategories.blue.length}, Gray: ${colorCategories.gray.length}, Other: ${colorCategories.other.length}`);
     
-    // Select colors ensuring diversity - at least one from each major category if available
-    const selected: ColorResult[] = [];
+    // Simply return the top N colors by frequency - no forced diversity
+    // The user wants to see what's actually in the image, not artificial variety
+    const selected = significantColors.slice(0, maxColors);
     
-    // Always include the top overall color
-    selected.push(colors[0]);
-    
-    // Try to include the top color from each category
-    const categories = ['red', 'orange', 'purple', 'blue', 'gray', 'other'] as const;
-    for (const category of categories) {
-      if (selected.length >= maxColors) break;
-      
-      const categoryColors = colorCategories[category];
-      if (categoryColors.length > 0) {
-        // Find the highest frequency color in this category that's not already selected
-        const bestInCategory = categoryColors.find(color => 
-          !selected.some(sel => sel.color === color.color)
-        );
-        
-        if (bestInCategory) {
-          selected.push(bestInCategory);
-          console.log(`✅ Selected ${category} color: ${bestInCategory.color} - ${bestInCategory.frequency.toFixed(2)}%`);
-        }
-      }
-    }
-    
-    // Fill remaining slots with highest frequency colors not yet selected
-    for (const color of colors) {
-      if (selected.length >= maxColors) break;
-      if (!selected.some(sel => sel.color === color.color)) {
-        selected.push(color);
-      }
-    }
-    
-    // Sort by frequency for final display
-    selected.sort((a, b) => b.frequency - a.frequency);
-    
-    // Normalize the selected colors to add up to exactly 100%
-    const selectedColors = selected.slice(0, maxColors);
-    const totalSelectedFrequency = selectedColors.reduce((sum, color) => sum + color.frequency, 0);
-    
-    // Recalculate percentages so they add up to 100%
-    const normalizedColors = selectedColors.map(color => ({
-      ...color,
-      frequency: (color.frequency / totalSelectedFrequency) * 100
-    }));
-    
-    console.log('🎯 Final normalized percentages (should add to 100%):');
-    const finalTotal = normalizedColors.reduce((sum, color) => sum + color.frequency, 0);
-    normalizedColors.forEach((color, i) => {
+    console.log('🎯 Final selected colors:');
+    selected.forEach((color, i) => {
       console.log(`${i+1}. ${color.color} - ${color.frequency.toFixed(1)}%`);
     });
-    console.log(`Total: ${finalTotal.toFixed(1)}%`);
     
-    return normalizedColors;
+    const total = selected.reduce((sum, color) => sum + color.frequency, 0);
+    console.log(`Total: ${total.toFixed(1)}%`);
+    
+    return selected;
   }
 
   /**

@@ -15,11 +15,15 @@
 - **CIE94 Delta-E Distance**: Professional color difference calculations for precise color matching
 - **Weighted Grid Analysis**: Processes images in 200×200 pixel sections with area-based frequency weighting
 - **Full Resolution Processing**: Analyzes images at their original resolution (up to 4096×2304 pixels) without downscaling
-- **Smart Color Selection**: Intelligent algorithm ensures diverse color representation across the entire spectrum
+- **Pixel-Perfect Accuracy**: Every pixel is counted individually for true color frequency distribution
+- **Minimum Frequency Threshold**: Filters out noise and anti-aliasing artifacts (colors < 0.5%) to show only real colors
+- **No Artificial Colors**: Returns only colors that actually exist in the image - no made-up or forced diversity
 
 ### 🔧 **Technical Excellence**
 - **Conservative Color Merging**: Special handling for red colors (Delta-E < 1.5) vs other colors (Delta-E < 3.0)
-- **Frequency Normalization**: Percentages automatically normalized to exactly 100%
+- **Frequency-Based Selection**: Returns top N colors by actual pixel frequency, not forced diversity
+- **Accurate Percentages**: Color frequencies reflect true pixel distribution without artificial inflation
+- **Noise Filtering**: Automatically filters out colors below 0.5% threshold (anti-aliasing, compression artifacts)
 - **Canvas-based Processing**: Browser-native image processing for optimal performance
 - **Memory Efficient**: Optimized algorithms for handling large images without memory overflow
 
@@ -155,18 +159,20 @@ Pallet-extractor-Gradient-generator/
 
 1. **Image Loading**: Canvas-based image loading preserving original resolution
 2. **Grid Analysis**: Image divided into 200×200 pixel sections for comprehensive analysis
-3. **Pixel Processing**: Each pixel converted from RGB to LAB color space
-4. **Color Counting**: Frequency analysis of each unique color in the image
-5. **Merging**: Similar colors merged using CIE94 Delta-E distance calculations
-6. **Selection**: Smart algorithm selects 5 most diverse and representative colors
-7. **Normalization**: Frequencies normalized to percentages totaling exactly 100%
+3. **Pixel Processing**: Each pixel converted from RGB to LAB color space and counted individually
+4. **Color Counting**: Exact frequency analysis of each unique color in every pixel
+5. **Noise Filtering**: Colors below 0.5% frequency threshold removed (anti-aliasing, compression artifacts)
+6. **Merging**: Similar colors merged using CIE94 Delta-E distance calculations (conservative thresholds)
+7. **Selection**: Returns top N colors by actual pixel frequency - no artificial diversity
+8. **Result**: Only real colors from the image are returned with accurate frequency percentages
 
 ### Key Algorithms
 
 - **LAB Color Space Conversion**: Perceptually uniform color representation
 - **CIE94 Delta-E**: Industry-standard color difference calculation
-- **Weighted Frequency Analysis**: Grid-based analysis with area weighting
+- **Weighted Frequency Analysis**: Grid-based analysis with area weighting for accuracy
 - **Conservative Merging**: Preserves important colors (especially reds) during merging process
+- **Minimum Frequency Threshold**: 0.5% threshold filters noise while preserving real colors
 
 ## 🎯 Usage Guide
 
@@ -174,9 +180,16 @@ Pallet-extractor-Gradient-generator/
 
 1. **Upload Image**: Drag and drop an image or click to browse
 2. **Extract Colors**: The application automatically processes the image
-3. **View Results**: See the 5 dominant colors with their percentages
+3. **View Results**: See the dominant colors with their actual percentages (returns 3-5 colors based on what exists in the image)
 4. **Copy Colors**: Click any color box to copy the hex code to clipboard
 5. **Copy All**: Use the "Copy All" button to copy all hex codes at once
+
+### Important Notes
+
+- **Accurate Results**: The extractor only returns colors that actually exist in your image (≥0.5% frequency)
+- **Variable Count**: If your image has only 3 distinct colors, you'll get 3 colors, not 5 artificial ones
+- **True Percentages**: Percentages reflect actual pixel distribution in the image
+- **Noise Filtering**: Anti-aliasing artifacts and compression noise are automatically filtered out
 
 ### Supported Image Formats
 
