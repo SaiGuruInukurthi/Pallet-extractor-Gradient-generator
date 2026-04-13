@@ -57,7 +57,85 @@
 - **Deployment**: Vercel
 - **Package Manager**: pnpm
 
-## 📋 Prerequisites
+## � Comprehensive Documentation
+
+This project includes **extensive professional documentation** for all aspects of the system:
+
+### Documentation Index
+
+#### 🏗️ **Architecture & System Design**
+- [**ARCHITECTURE.md**](DOCS/ARCHITECTURE.md) - System architecture, component design, data flow, performance characteristics
+  - Layered architecture (Presentation, Business Logic, Platform)
+  - Component hierarchy and responsibilities
+  - Integration points and deployment architecture
+
+#### 🔌 **API Reference**
+- [**API_DOCUMENTATION.md**](DOCS/API_DOCUMENTATION.md) - Complete API documentation for ColorExtractor class
+  - Public interfaces and data types (ColorResult, RGB, LAB)
+  - Method signatures with parameters and return values
+  - Usage examples and performance guidelines
+  - Error handling and optimization tips
+
+#### 🔬 **Technical Deep Dive**
+- [**TECHNICAL_GUIDE.md**](DOCS/TECHNICAL_GUIDE.md) - Advanced technical implementation details
+  - Color science foundation (RGB, LAB, XYZ color spaces)
+  - Advanced algorithms (weighted grid analysis, color clustering, CIE94 Delta-E)
+  - Implementation patterns and performance optimization
+  - Browser API usage and security considerations
+  - Testing strategies and troubleshooting guide
+
+#### 🎨 **Frontend Development**
+- [**FRONTEND_GUIDE.md**](DOCS/FRONTEND_GUIDE.md) - Frontend architecture, components, and UX patterns
+  - Technology stack and architectural patterns
+  - Component breakdown and specifications
+  - State management and styling system
+  - UX patterns (drag-drop, copy feedback, progressive disclosure)
+  - Mobile optimization and accessibility features
+  - Common tasks and best practices
+
+#### 🚀 **Deployment & Operations**
+- [**DEPLOYMENT.md**](DOCS/DEPLOYMENT.md) - Production deployment and operational procedures
+  - Deployment overview and Vercel setup
+  - CI/CD pipeline configuration
+  - Pre-deployment checklist and monitoring
+  - Performance optimization and security hardening
+  - Rollback procedures and troubleshooting
+
+#### 👨‍💻 **Developer Setup & Workflow**
+- [**DEVELOPER_GUIDE.md**](DOCS/DEVELOPER_GUIDE.md) - Local development setup and Git workflows
+  - Environment setup with Node.js and dependencies
+  - Development workflow and Git branching strategy
+  - Code quality (TypeScript, linting, formatting)
+  - Debugging and testing procedures
+  - IDE setup for VS Code
+  - Common development tasks
+
+#### 📊 **System Diagrams**
+- [**DIAGRAMS.md**](DOCS/DIAGRAMS.md) - Visual documentation with 10+ Mermaid diagrams
+  - System architecture diagram (layered design)
+  - Component hierarchy diagram (React tree)
+  - Data flow diagram (user to output)
+  - Sequence diagrams (color extraction process)
+  - State machines (application states)
+  - Class diagrams (object design)
+  - Deployment architecture
+  - Process flow diagrams
+
+### Quick Links by Use Case
+
+| **I want to...** | **Read this** |
+|---|---|
+| Understand the system architecture | [ARCHITECTURE.md](DOCS/ARCHITECTURE.md) |
+| Use the ColorExtractor API | [API_DOCUMENTATION.md](DOCS/API_DOCUMENTATION.md) |
+| Deep dive into algorithms | [TECHNICAL_GUIDE.md](DOCS/TECHNICAL_GUIDE.md) |
+| Contribute to frontend | [FRONTEND_GUIDE.md](DOCS/FRONTEND_GUIDE.md) |
+| Deploy to production | [DEPLOYMENT.md](DOCS/DEPLOYMENT.md) |
+| Set up local development | [DEVELOPER_GUIDE.md](DOCS/DEVELOPER_GUIDE.md) |
+| See visual diagrams | [DIAGRAMS.md](DOCS/DIAGRAMS.md) |
+
+---
+
+## �📋 Prerequisites
 
 Before setting up the project, ensure you have the following installed:
 
